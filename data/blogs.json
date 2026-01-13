@@ -1,0 +1,122 @@
+{
+  "blogs": [
+    {
+      "id": "1",
+      "slug": "future-of-exhibition-sales",
+      "title": "The Future of Exhibition Sales: Audio-First Intelligence",
+      "excerpt": "Discover how AI-driven audio capture is transforming high-stakes sales conversations at global trade shows.",
+      "coverImage": "/images/blogs/future-sales.jpg",
+      "author": "LeadPulze Team",
+      "publishedDate": "Jan 12, 2026",
+      "readingTime": "6 min read",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Exhibition floors are some of the most information-dense environments in sales. Buyers share problems, timelines, budget hints, and competitive context — all within minutes. Yet most of this intelligence is lost before it ever reaches a CRM."
+        },
+        {
+          "type": "paragraph",
+          "text": "Traditional note-taking and post-event data entry fail because they rely on human memory under pressure. LeadPulze introduces an audio-first approach that captures conversations as they happen and converts them into structured, actionable sales intelligence."
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "text": "Why Audio-First Matters at Exhibitions"
+        },
+        {
+          "type": "paragraph",
+          "text": "Research shows that sales professionals forget over half of conversation details within an hour. At exhibitions, where conversations are back-to-back and environments are noisy, this loss happens even faster."
+        },
+        {
+          "type": "paragraph",
+          "text": "Audio-first capture aligns with how humans naturally communicate. Instead of interrupting conversations to type notes, sales reps speak freely and let AI preserve the full context."
+        },
+        {
+          "type": "list",
+          "items": [
+            "Preserves tone, urgency, and intent from real conversations",
+            "Eliminates post-event data entry delays",
+            "Creates consistent lead quality across large teams",
+            "Works reliably even in low-connectivity environments"
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "text": "From Raw Conversations to Sales Intelligence"
+        },
+        {
+          "type": "paragraph",
+          "text": "LeadPulze does more than transcribe audio. AI models analyze conversations to extract problems, buying timelines, objections, and competitor mentions — turning unstructured speech into structured sales data in real time."
+        },
+        {
+          "type": "paragraph",
+          "text": "This allows sales teams to prioritize leads immediately, personalize follow-ups, and maintain continuity even when leads are handed off between team members."
+        },
+        {
+          "type": "quote",
+          "text": "The booth is for building connections. AI is for remembering everything that matters."
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "slug": "maximizing-booth-roi",
+      "title": "Maximizing Booth ROI with Real-Time Data",
+      "excerpt": "Stop guessing which leads are hot. Learn how real-time conversation intelligence helps teams prioritize follow-ups instantly.",
+      "coverImage": "/images/blogs/booth-roi.jpg",
+      "author": "Sarah Jenkins",
+      "publishedDate": "Jan 10, 2026",
+      "readingTime": "5 min read",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Exhibitions require significant investment — booth space, travel, marketing collateral, and sales time. Yet many teams still measure success using only lead counts, not lead quality."
+        },
+        {
+          "type": "paragraph",
+          "text": "Without understanding which conversations showed real intent, sales teams treat every lead equally — resulting in wasted follow-up effort and missed revenue."
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "text": "Why Lead Quality Matters More Than Lead Volume"
+        },
+        {
+          "type": "paragraph",
+          "text": "Two leads collected at the same booth can have completely different potential. One might be browsing, while the other has a clear problem, budget, and decision timeline."
+        },
+        {
+          "type": "paragraph",
+          "text": "Conversation intelligence helps teams distinguish between these signals instantly instead of days later."
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "text": "Real-Time, Data-Driven Follow-ups"
+        },
+        {
+          "type": "paragraph",
+          "text": "LeadPulze analyzes conversations as they are captured and assigns priority scores based on intent, urgency, and keywords mentioned during discussions."
+        },
+        {
+          "type": "paragraph",
+          "text": "Sales teams can trigger personalized follow-ups within hours — while the conversation is still fresh in the buyer’s mind."
+        },
+        {
+          "type": "list",
+          "items": [
+            "Identify high-intent leads before leaving the event",
+            "Align sales and marketing around real customer demand",
+            "Justify exhibition spend with measurable outcomes",
+            "Improve close rates without increasing booth costs"
+          ]
+        },
+        {
+          "type": "quote",
+          "text": "Exhibition ROI improves when teams measure conversations, not just contacts."
+        }
+      ]
+    }
+  ]
+}
