@@ -32,19 +32,22 @@ interface WorkflowDiagramProps {
    Component
 ======================= */
 
-const AUTO_ADVANCE_INTERVAL = 6000 // ⏱️ 6 seconds (tweak if needed)
+const AUTO_ADVANCE_INTERVAL = 6000 // desktop dots
 
 const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({ workflow }) => {
   const [activeStep, setActiveStep] = useState<number>(0)
 
-  // 🔹 NEW: track timer reference
+  // Desktop auto advance
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Mobile horizontal scroll
+  const mobileScrollRef = useRef<HTMLDivElement | null>(null)
 
   const step = workflow.steps[activeStep]
 
   /* =======================
-       Auto-advance logic
-    ======================= */
+     Desktop Auto Advance
+  ======================= */
   useEffect(() => {
     startAutoAdvance()
     return stopAutoAdvance
@@ -54,7 +57,9 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({ workflow }) => {
   const startAutoAdvance = () => {
     stopAutoAdvance()
     intervalRef.current = setInterval(() => {
-      setActiveStep((prev) => (prev === workflow.steps.length - 1 ? 0 : prev + 1))
+      setActiveStep((prev) =>
+        prev === workflow.steps.length - 1 ? 0 : prev + 1
+      )
     }, AUTO_ADVANCE_INTERVAL)
   }
 
@@ -72,13 +77,41 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({ workflow }) => {
 
   const goNext = () => {
     stopAutoAdvance()
-    setActiveStep((prev) => (prev === workflow.steps.length - 1 ? 0 : prev + 1))
+    setActiveStep((prev) =>
+      prev === workflow.steps.length - 1 ? 0 : prev + 1
+    )
   }
 
   const goPrev = () => {
     stopAutoAdvance()
     setActiveStep((prev) => Math.max(0, prev - 1))
   }
+
+  /* =======================
+     Mobile Auto Scroll
+  ======================= */
+  useEffect(() => {
+    if (!mobileScrollRef.current) return
+
+    const container = mobileScrollRef.current
+    const card = container.firstElementChild as HTMLElement | null
+    if (!card) return
+
+    const gap = 16
+    const cardWidth = card.offsetWidth + gap
+
+    const timer = setInterval(() => {
+      const maxScroll = container.scrollWidth - container.clientWidth
+
+      if (container.scrollLeft >= maxScroll - 10) {
+        container.scrollTo({ left: 0, behavior: "smooth" })
+      } else {
+        container.scrollBy({ left: cardWidth, behavior: "smooth" })
+      }
+    }, 5000)
+
+    return () => clearInterval(timer)
+  }, [])
 
   return (
     <div>
@@ -87,30 +120,39 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({ workflow }) => {
         <div className="relative">
           <div className="max-w-5xl mx-auto relative">
             <div className="absolute -inset-4 bg-blue-500/10 blur-3xl rounded-3xl" />
+
+            {/* Timeline */}
             <div className="flex items-center justify-between mb-12">
               {workflow.steps.map((step, index) => (
                 <React.Fragment key={index}>
                   <button
                     onClick={() => handleStepChange(index)}
-                    className={`flex flex-col items-center gap-3 transition-all duration-300 ${
-                      activeStep === index ? "scale-110" : "opacity-60 hover:opacity-100"
-                    }`}
+                    className={`flex flex-col items-center gap-3 transition-all duration-300 ${activeStep === index
+                        ? "scale-110"
+                        : "opacity-60 hover:opacity-100"
+                      }`}
                   >
                     <div
-                      className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
-                        activeStep === index ? "bg-gradient-to-br from-primary to-secondary shadow-lg" : "bg-muted"
-                      }`}
+                      className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${activeStep === index
+                          ? "bg-gradient-to-br from-primary to-secondary shadow-lg"
+                          : "bg-muted"
+                        }`}
                     >
                       <Icon
                         name={step.icon}
                         size={28}
-                        color={activeStep === index ? "#FFFFFF" : "var(--color-muted-foreground)"}
+                        color={
+                          activeStep === index
+                            ? "#FFFFFF"
+                            : "var(--color-muted-foreground)"
+                        }
                       />
                     </div>
                     <span
-                      className={`text-sm font-medium ${
-                        activeStep === index ? "text-primary" : "text-muted-foreground"
-                      }`}
+                      className={`text-sm font-medium ${activeStep === index
+                          ? "text-primary"
+                          : "text-muted-foreground"
+                        }`}
                     >
                       {step.label}
                     </span>
@@ -119,9 +161,8 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({ workflow }) => {
                   {index < workflow.steps.length - 1 && (
                     <div className="flex-1 h-1 mx-4 bg-muted rounded-full overflow-hidden">
                       <div
-                        className={`h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500 ${
-                          activeStep > index ? "w-full" : "w-0"
-                        }`}
+                        className={`h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500 ${activeStep > index ? "w-full" : "w-0"
+                          }`}
                       />
                     </div>
                   )}
@@ -130,50 +171,56 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({ workflow }) => {
             </div>
           </div>
 
-          {/* ================= Step Details ================= */}
+          {/* Step Details */}
           <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 md:p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-              {/* LEFT — IMAGE */}
               {step.image && (
                 <div className="order-2 md:order-1 flex justify-center">
                   <Image
-                    src={step.image || "/placeholder.svg"}
+                    src={step.image}
                     alt={step.title}
-                    width={320}
-                    height={450}
+                    width={360}
+                    height={480}
                     priority
-                    className="
-                        rounded-3xl
-                        shadow-2xl
-                        border border-white/40
-                        bg-white
-                        max-w-[90%]
-                        md:max-w-[420px]
-                      "
+                    className="rounded-3xl shadow-2xl border border-white/40 bg-white max-w-[90%]"
                   />
                 </div>
               )}
 
-              {/* RIGHT — CONTENT */}
               <div className="order-1 md:order-2">
                 <div className="flex items-start gap-4 mb-6">
                   <div className="p-3 bg-white rounded-lg shadow-sm">
-                    <Icon name={step.icon} size={24} color="var(--color-primary)" />
+                    <Icon
+                      name={step.icon}
+                      size={24}
+                      color="var(--color-primary)"
+                    />
                   </div>
                   <div>
-                    <h4 className="text-lg md:text-xl font-bold text-foreground mb-2">{step.title}</h4>
-                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{step.description}</p>
+                    <h4 className="text-lg md:text-xl font-bold mb-2">
+                      {step.title}
+                    </h4>
+                    <p className="text-sm md:text-base text-muted-foreground">
+                      {step.description}
+                    </p>
                   </div>
                 </div>
 
                 {step.details && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {step.details.map((detail, index) => (
-                      <div key={index} className="flex items-start gap-3 bg-white rounded-lg p-4">
+                    {step.details.map((detail, i) => (
+                      <div
+                        key={i}
+                        className="flex gap-3 bg-white rounded-lg p-4"
+                      >
                         <div className="p-1 bg-primary/10 rounded mt-1">
-                          <Icon name="Check" size={14} color="var(--color-primary)" />
+                          <Icon
+                            name="Check"
+                            size={14}
+                            color="var(--color-primary)"
+                          />
                         </div>
-                        <span className="text-sm text-foreground">{detail}</span>
+                        <span className="text-sm">{detail}</span>
                       </div>
                     ))}
                   </div>
@@ -182,7 +229,7 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({ workflow }) => {
             </div>
           </div>
 
-          {/* ================= Navigation ================= */}
+          {/* Desktop Nav */}
           <div className="flex items-center justify-between mt-6">
             <button
               onClick={goPrev}
@@ -190,7 +237,7 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({ workflow }) => {
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary disabled:text-muted-foreground"
             >
               <Icon name="ChevronLeft" size={16} />
-              <span className="hidden sm:inline">Previous</span>
+              Previous
             </button>
 
             <div className="flex items-center gap-2">
@@ -198,83 +245,86 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({ workflow }) => {
                 <button
                   key={index}
                   onClick={() => handleStepChange(index)}
-                  className={`h-2 rounded-full transition-all ${
-                    activeStep === index ? "w-8 bg-primary" : "w-2 bg-muted"
-                  }`}
+                  className={`h-2 rounded-full transition-all ${activeStep === index ? "w-8 bg-primary" : "w-2 bg-muted"
+                    }`}
                 />
               ))}
             </div>
 
-            <button onClick={goNext} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary">
-              <span className="hidden sm:inline">Next</span>
+            <button
+              onClick={goNext}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary"
+            >
+              Next
               <Icon name="ChevronRight" size={16} />
             </button>
           </div>
         </div>
       </div>
 
-      {/* ================= Mobile: Individual Step Cards ================= */}
-      <div className="lg:hidden space-y-3 sm:space-y-4 px-0 sm:px-0">
-        {workflow.steps.map((step, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-200 mx-4 sm:mx-0"
-          >
-            {/* Step Badge and Title Header */}
-            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 px-4 pt-3 pb-3 sm:pt-4 sm:pb-4">
-              <div className="flex items-start gap-2 sm:gap-3">
-                {/* Icon Container - CHANGE: reduce icon size on mobile */}
-                <div className="p-2 sm:p-2.5 bg-gradient-to-br from-primary to-secondary rounded-lg flex-shrink-0 shadow-sm">
-                  <Icon name={step.icon} size={18} color="#FFFFFF" />
-                </div>
-                {/* Title and Badge */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-0.5">
-                    Step {index + 1} of {workflow.steps.length}
-                  </p>
-                  <h3 className="text-sm sm:text-base font-bold text-foreground leading-snug">{step.title}</h3>
+      {/* ================= Mobile Horizontal Carousel ================= */}
+      <div className="lg:hidden relative">
+        <div
+          ref={mobileScrollRef}
+          className="flex overflow-x-auto snap-x snap-mandatory space-x-4 px-4 pb-4 scrollbar-hide"
+        >
+          {workflow.steps.map((step, index) => (
+            <div
+              key={index}
+              className="min-w-[90%] snap-center bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 px-4 py-3">
+                <div className="flex gap-3">
+                  <div className="p-2 bg-gradient-to-br from-primary to-secondary rounded-lg">
+                    <Icon name={step.icon} size={18} color="#fff" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-primary uppercase">
+                      Step {index + 1} of {workflow.steps.length}
+                    </p>
+                    <h3 className="text-sm font-bold">{step.title}</h3>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Card Body - CHANGE: improved spacing and typography */}
-            <div className="px-4 py-3 sm:py-4 space-y-3 sm:space-y-4">
-              {/* Image - Full width and prominent */}
-              {step.image && (
-                <div className="flex justify-center -mx-4 px-4 py-2 sm:py-3">
+              {/* Body */}
+              <div className="p-4 space-y-3">
+                {step.image && (
                   <Image
-                    src={step.image || "/placeholder.svg"}
+                    src={step.image}
                     alt={step.title}
-                    width={300}
-                    height={400}
-                    priority
-                    className="rounded-lg shadow-md border border-gray-100 max-w-full h-auto"
+                    width={320}
+                    height={420}
+                    className="rounded-lg shadow-md mx-auto"
                   />
-                </div>
-              )}
+                )}
 
-              {/* Description - Clear and readable */}
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {step.description}
+                </p>
 
-              {/* Details - Organized and scannable - CHANGE: reduced padding and improved spacing */}
-              {step.details && (
-                <div className="space-y-2 pt-1 sm:pt-2">
-                  {step.details.map((detail, detailIndex) => (
-                    <div
-                      key={detailIndex}
-                      className="flex items-start gap-2 sm:gap-3 bg-gradient-to-r from-blue-50 to-transparent rounded-lg p-2.5 sm:p-3 border border-blue-100/50"
-                    >
-                      <div className="p-1 bg-primary/15 rounded flex-shrink-0 mt-0.5">
-                        <Icon name="Check" size={12} color="var(--color-primary)" />
+                {step.details && (
+                  <div className="space-y-2">
+                    {step.details.map((d, i) => (
+                      <div
+                        key={i}
+                        className="flex gap-2 bg-blue-50 rounded-md p-2"
+                      >
+                        <Icon
+                          name="Check"
+                          size={12}
+                          color="var(--color-primary)"
+                        />
+                        <span className="text-xs">{d}</span>
                       </div>
-                      <span className="text-xs sm:text-xs text-foreground leading-relaxed">{detail}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   )

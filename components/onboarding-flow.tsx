@@ -19,6 +19,7 @@ export function DemoBookingModal({
   })
 
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
   useEffect(() => {
@@ -35,23 +36,46 @@ export function DemoBookingModal({
 
   if (!isOpen) return null
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.name || !formData.email) {
       setError("Please fill all fields")
       return
     }
 
     setError("")
-    setSubmitted(true)
+    setLoading(true)
 
-    // 👉 Send lead to backend / CRM here
-    // fetch("/api/book-demo", { method: "POST", body: JSON.stringify(formData) })
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(
+          data.emailError ||
+          data.nameError ||
+          data.message ||
+          "Something went wrong"
+        )
+        setLoading(false)
+        return
+      }
+
+      setSubmitted(true)
+    } catch (err) {
+      setError("Network error. Please try again.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-card border border-white/10 rounded-2xl p-6 shadow-2xl relative">
-
         {/* Close */}
         <button
           onClick={onClose}
@@ -62,9 +86,7 @@ export function DemoBookingModal({
 
         {!submitted ? (
           <div className="space-y-5">
-            <h2 className="text-2xl font-bold text-center">
-              Book a Demo
-            </h2>
+            <h2 className="text-2xl font-bold text-center">Book a Demo</h2>
 
             <p className="text-sm text-muted-foreground text-center">
               Tell us a bit about you — we’ll reach out shortly.
@@ -95,8 +117,12 @@ export function DemoBookingModal({
 
             {error && <p className="text-xs text-red-500">{error}</p>}
 
-            <Button className="w-full h-12" onClick={handleSubmit}>
-              Request Demo
+            <Button
+              className="w-full h-12"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? "Submitting..." : "Request Demo"}
             </Button>
 
             <p className="text-xs text-muted-foreground text-center">
@@ -106,9 +132,7 @@ export function DemoBookingModal({
         ) : (
           <div className="text-center space-y-4 py-10">
             <CheckCircle className="mx-auto size-12 text-primary" />
-            <h3 className="text-xl font-semibold">
-              You’re all set!
-            </h3>
+            <h3 className="text-xl font-semibold">You’re all set!</h3>
             <p className="text-sm text-muted-foreground">
               Our team will contact you shortly to schedule your demo.
             </p>
